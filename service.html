@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services | Topister Akinyi - Content Creator</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style2.css">
+    <link rel="icon" href="images/icon.jpg" type="image/x-icon">
+        <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <style>
+        :root {
+            --bg-color: #1f242d;
+            --second-bg-color: #323946;
+            --text-color: #fff;
+            --main-color: #7cf03d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* Services Section (unchanged) */
+        .services {
+            padding: 8rem 9%;
+            background: var(--second-bg-color);
+        }
+        .services h2 {
+            font-size: 4.5rem;
+            text-align: center;
+            margin-bottom: 5rem;
+        }
+        .services h2 span {
+            color: var(--main-color);
+        }
+        .services-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 3rem;
+            align-items: center;
+        }
+        .service-box {
+            background: var(--bg-color);
+            padding: 3rem 2rem 4rem;
+            border-radius: 2rem;
+            text-align: center;
+            border: .2rem solid var(--bg-color);
+            transition: .5s ease;
+            position: relative;
+        }
+        .service-box:hover {
+            border-color: var(--main-color);
+            transform: scale(1.02);
+        }
+        .service-box i {
+            font-size: 6rem;
+            color: var(--main-color);
+            margin-bottom: 2rem;
+        }
+        .service-box h3 {
+            font-size: 2.4rem;
+            margin-bottom: 1.5rem;
+        }
+        .service-box p {
+            font-size: 1.6rem;
+            margin-bottom: 2rem;
+        }
+        .service-price {
+            font-size: 2.2rem;
+            color: var(--main-color);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        /* Book Now Button (unchanged) */
+        .book-now-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 1rem 2.8rem;
+            background: var(--main-color);
+            border-radius: 4rem;
+            box-shadow: 0 0 1rem var(--main-color); 
+            font-size: 1.6rem;
+            color: var(--bg-color);
+            font-weight: 600;
+            letter-spacing: .1rem;
+            transition: .5s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        .book-now-btn:hover {
+            box-shadow: none;
+            background: transparent;
+            color: var(--main-color);
+        }
+        .book-now-btn i {
+            font-size: 1.8rem;
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .book-now-btn:hover i {
+            transform: translateX(5px);
+        }
+
+        /* Updated Payment Modal - Smaller Size */
+        .payment-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            overflow-y: auto; /* Enable scrolling if needed */
+            padding: 20px; /* Add padding for mobile */
+        }
+
+        .modal-content {
+            background: var(--second-bg-color);
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            width: 100%;
+            max-width: 400px; /* Reduced from 500px */
+            box-shadow: 0 0 2rem var(--main-color);
+            position: relative;
+            margin: auto; /* Center vertically */
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: var(--text-color);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: var(--main-color);
+        }
+
+        .modal-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .modal-header h2 {
+            font-size: 2rem; /* Slightly smaller */
+            color: var(--main-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .modal-header p {
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 1.4rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border-radius: 0.6rem;
+            border: 0.1rem solid rgba(255,255,255,0.1);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 1.4rem;
+        }
+
+        #card-element {
+            padding: 1rem;
+            border-radius: 0.6rem;
+            border: 0.1rem solid rgba(255,255,255,0.1);
+            background: var(--bg-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .submit-payment {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--main-color);
+            color: var(--bg-color);
+            border: none;
+            border-radius: 0.6rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+
+        .submit-payment:hover {
+            opacity: 0.9;
+        }
+
+        .submit-payment i {
+            margin-left: 0.5rem;
+        }
+
+        /* Loading State */
+        .loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .loading::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            width: 1.8rem;
+            height: 1.8rem;
+            border: 0.2rem solid rgba(31, 36, 45, 0.2);
+            border-top-color: var(--bg-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        /* Success Message */
+        .payment-success {
+            text-align: center;
+            display: none;
+            padding: 1.5rem;
+        }
+
+        .payment-success i {
+            font-size: 4rem;
+            color: var(--main-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-success h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .payment-success p {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 2rem;
+                max-width: 90%; /* More screen space on mobile */
+            }
+            
+            .services h2 {
+                font-size: 3.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 1.5rem;
+            }
+            
+            .modal-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .form-group input, .form-group select {
+                padding: 0.8rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+        <nav class="navbar">
+        <a href="images/icon.jpg" class="logo">
+            <img src="images/icon.jpg" alt="Topi" class="logo-img"><span style="color: var(--main-color);"> Port</span>folio
+            <span class="logo-text">Topister</span>
+        </a>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="portfolio.html">Portfolio</a></li>
+            <li class="active"><a href="service.html">Service</a></li>
+            <li><a href="contact.html">Contact</a></li>
+        </ul> 
+    </nav>
+
+    <div class="bars-animation">
+        <div class="bar" style="--1:6;"></div>
+        <div class="bar" style="--1:5;"></div>
+        <div class="bar" style="--1:4;"></div>
+        <div class="bar" style="--1:3;"></div>
+        <div class="bar" style="--1:2;"></div>
+        <div class="bar" style="--1:1;"></div>
+    </div>
+
+    <section class="services" id="services">
+        <h2>My <span>Services</span></h2>
+        
+        <div class="services-container">
+            <!-- Service 1 - Updated to KES -->
+            <div class="service-box">
+                <i class='bx bxl-tiktok'></i>
+                <h3>TikTok Content Creation</h3>
+                <p>Creative short-form videos optimized for virality and audience growth on TikTok.</p>
+                <div class="service-price">KES 20,000/week</div>
+                <button class="book-now-btn" data-service="TikTok Content Creation" data-price="20000">
+                    Book Now <i class='bx bx-chevron-right'></i>
+                </button>
+            </div>
+            
+            <!-- Service 2 - Updated to KES -->
+            <div class="service-box">
+                <i class='bx bxl-youtube'></i>
+                <h3>YouTube Management</h3>
+                <p>Complete YouTube channel management including content strategy and optimization.</p>
+                <div class="service-price">KES 35,000/month</div>
+                <button class="book-now-btn" data-service="YouTube Management" data-price="35000">
+                    Book Now <i class='bx bx-chevron-right'></i>
+                </button>
+            </div>
+            
+            <!-- Service 3 - Updated to KES -->
+            <div class="service-box">
+                <i class='bx bx-star'></i>
+                <h3>Brand Collaborations</h3>
+                <p>Authentic influencer marketing campaigns that connect brands with Gen Z audiences.</p>
+                <div class="service-price">KES 50,000/campaign</div>
+                <button class="book-now-btn" data-service="Brand Collaborations" data-price="50000">
+                    Book Now <i class='bx bx-chevron-right'></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="payment-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            
+            <div class="modal-header">
+                <h2>Complete Your Booking</h2>
+                <p>Enter your details to secure your booking</p>
+            </div>
+            
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" placeholder="Your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="your@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="service">Service</label>
+                    <input type="text" id="service" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount">Amount (KES)</label>
+                    <input type="text" id="amount" readonly>
+                </div>
+                
+                <div id="card-element">
+                    <!-- Stripe Elements will be inserted here -->
+                </div>
+                
+                <div id="card-errors" role="alert" style="color: #ff4d4d; margin-bottom: 1rem;"></div>
+                
+                <button type="submit" id="submit-payment" class="submit-payment">
+                    Pay Now <i class='bx bx-lock-alt'></i>
+                </button>
+            </form>
+            
+            <div class="payment-success" id="payment-success">
+                <i class='bx bx-check-circle'></i>
+                <h3>Booking Confirmed!</h3>
+                <p>Thank you for your payment.</p>
+                <p>A confirmation has been sent to your email.</p>
+            </div>
+        </div>
+    </div>
+
+         <footer class="footer">
+        <div class="footer-text">
+            <p>Copyright &copy; 2025 by Topister | All Rights Reserved.</p>
+        </div>
+        <div class="footer-iconTop">
+            <a href="#home"><i class='bx bx-up-arrow-alt'></i></a>
+        </div>
+    </footer>
+
+    <script>
+        // Stripe Integration with KES currency
+        const stripe = Stripe('pk_test_your_publishable_key'); // Replace with your test key
+        
+        // DOM Elements
+        const bookNowBtns = document.querySelectorAll('.book-now-btn');
+        const paymentModal = document.getElementById('paymentModal');
+        const closeModal = document.querySelector('.close-modal');
+        const paymentForm = document.getElementById('payment-form');
+        const submitBtn = document.getElementById('submit-payment');
+        const paymentSuccess = document.getElementById('payment-success');
+        const serviceInput = document.getElementById('service');
+        const amountInput = document.getElementById('amount');
+        const cardErrors = document.getElementById('card-errors');
+        
+        let elements, cardElement;
+        let selectedService = '';
+        let selectedPrice = 0;
+
+        // Format KES currency
+        function formatKES(amount) {
+            return new Intl.NumberFormat('en-KE', {
+                style: 'currency',
+                currency: 'KES',
+                minimumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Initialize Stripe Elements with KES
+        function initializeStripeElements() {
+            elements = stripe.elements({
+                mode: 'payment',
+                amount: selectedPrice,
+                currency: 'kes', // Kenyan Shilling
+                appearance: {
+                    theme: 'night',
+                    variables: {
+                        colorPrimary: '#7cf03d',
+                        colorBackground: '#1f242d',
+                        colorText: '#ffffff',
+                        borderRadius: '8px'
+                    }
+                }
+            });
+
+            cardElement = elements.create('card');
+            cardElement.mount('#card-element');
+            
+            // Handle real-time validation errors
+            cardElement.on('change', (event) => {
+                if (event.error) {
+                    cardErrors.textContent = event.error.message;
+                } else {
+                    cardErrors.textContent = '';
+                }
+            });
+        }
+
+        // Open Modal with Service Details
+        bookNowBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                selectedService = e.target.getAttribute('data-service');
+                selectedPrice = parseInt(e.target.getAttribute('data-price'));
+                
+                // Set service details in form
+                serviceInput.value = selectedService;
+                amountInput.value = formatKES(selectedPrice);
+                
+                // Open modal
+                paymentModal.style.display = 'flex';
+                
+                // Initialize Stripe Elements
+                initializeStripeElements();
+            });
+        });
+
+        // Close Modal
+        closeModal.addEventListener('click', () => {
+            paymentModal.style.display = 'none';
+            if (elements) {
+                elements.unmount();
+            }
+            cardErrors.textContent = '';
+        });
+
+        // Handle Form Submission
+        paymentForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Show loading state
+            submitBtn.classList.add('loading');
+            cardErrors.textContent = '';
+            
+            // In a real application, you would:
+            // 1. Call your backend to create a PaymentIntent
+            // 2. Confirm the payment with Stripe
+            // 3. Handle success/error cases
+            
+            // For this demo, we'll simulate a successful payment
+            setTimeout(() => {
+                submitBtn.classList.remove('loading');
+                paymentForm.style.display = 'none';
+                paymentSuccess.style.display = 'block';
+                
+                // Reset form and close modal after 3 seconds
+                setTimeout(() => {
+                    paymentModal.style.display = 'none';
+                    paymentForm.style.display = 'block';
+                    paymentSuccess.style.display = 'none';
+                    paymentForm.reset();
+                    
+                    // Unmount Stripe elements
+                    if (elements) {
+                        elements.unmount();
+                    }
+                }, 3000);
+            }, 1500);
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === paymentModal) {
+                paymentModal.style.display = 'none';
+                if (elements) {
+                    elements.unmount();
+                }
+                cardErrors.textContent = '';
+            }
+        });
+    </script>
+</body>
+</html>
